@@ -58,7 +58,9 @@
      "k": "c9",
      "chara": "ケリュドラ",
      "name": "てい",
-     "x": "cos_tei"
+     "x": "cos_tei",
+     "free": true,
+     "note": "スタジオ代不問"
     },
     {
      "k": "c10",
