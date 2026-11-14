@@ -16,6 +16,12 @@ h1{font-size:20px;margin:0 0 2px;letter-spacing:.02em}
 .sub{color:var(--muted);font-size:13px;margin-bottom:14px}
 .summary{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:18px;position:sticky;top:0;z-index:2;background:var(--bg);padding:8px 0}
 .stat{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:10px 12px}
+.feebox{grid-column:1/-1;background:var(--card);border:1px solid var(--line);border-radius:12px;padding:8px 12px}
+.feebox .mrow{display:flex;align-items:baseline;gap:8px}
+.feebox .lbl{font-size:12px;color:var(--muted)}
+.feebox b{font-size:20px;font-variant-numeric:tabular-nums;color:var(--gold)}
+.feebox .of{font-size:14px;color:var(--muted);font-variant-numeric:tabular-nums}
+.feebox .msub{font-size:11px;color:var(--muted);margin-top:1px}
 .stat .lbl{font-size:12px;color:var(--muted)}
 .stat .num{font-size:22px;font-weight:700;font-variant-numeric:tabular-nums}
 .stat .num small{font-size:14px;color:var(--muted);font-weight:500}
@@ -158,15 +164,19 @@ function nowHM(){ var d=new Date(); return (d.getHours()<10?"0":"")+d.getHours()
 function findP(k){ var r=null; PEOPLE.forEach(function(g){g.list.forEach(function(p){ if(p.k===k) r=p; });}); return r; }
 var editing=null;
 function render(){
-  var all=[], payable=[];
-  PEOPLE.forEach(function(g){g.list.forEach(function(p){all.push(p); if(!p.free) payable.push(p);});});
+  var all=[];
+  PEOPLE.forEach(function(g){g.list.forEach(function(p){all.push(p);});});
+  var FEE = state.fee || 5500;
   var nA = all.filter(function(p){return state.att[p.k];}).length;
   var nP = all.filter(function(p){return state.paid[p.k];}).length;
-  all.forEach(function(p){ if(p.free && state.paid[p.k]) payable.push(p); });
+  var due = all.filter(function(p){ return (state.att[p.k] && !p.free) || state.paid[p.k]; });
+  var yen = function(n){ return "¥" + n.toLocaleString("ja-JP"); };
   var h = '<div class="wrap"><h1>1115 黄金裔併せ 出席表</h1><div class="sub">出席・スタジオ代徴収チェック ・ <a class="toplink" href="./">タイムテーブルへ</a></div>';
   h += '<div class="summary">'
      + stat("出席", nA, all.length)
-     + stat("スタジオ代 徴収済", nP, payable.length)
+     + stat("スタジオ代 徴収済", nP, due.length)
+     + '<div class="feebox"><div class="mrow"><span class="lbl">徴収済</span><b>'+yen(nP*FEE)+'</b><span class="of">/ '+yen(due.length*FEE)+'</span></div>'
+     + '<div class="msub">1人 '+yen(FEE)+'・出席（不問以外）'+due.length+'人分・未徴収 '+yen((due.length-nP)*FEE)+'（'+(due.length-nP)+'人）</div></div>'
      + '</div>';
   var waits = all.filter(function(p){ return state.eta[p.k] && !state.att[p.k]; })
                  .sort(function(a,b){ return state.eta[a.k] < state.eta[b.k] ? -1 : 1; });
