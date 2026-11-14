@@ -135,12 +135,7 @@
    ]
   }
  ],
- "att": {
-  "c1": true,
-  "c2": true,
-  "c3": true,
-  "c4": true
- },
+ "att": {},
  "paid": {
   "c13": true
  },
