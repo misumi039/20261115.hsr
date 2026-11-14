@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>1115 黄金裔併せ 出席表</title>
+<style>
+:root{
+  --bg:#f7f4ec; --card:#fff; --ink:#2a2620; --muted:#8a8172; --line:#e6dfcf;
+  --gold:#b08a2e; --gold-soft:#f3e7c4; --ok:#2f7d4f; --ok-soft:#e1f1e6; --ng:#b4473a;
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:"Hiragino Sans","Noto Sans JP",system-ui,sans-serif;font-size:15px;line-height:1.5}
+.wrap{max-width:760px;margin:0 auto;padding:20px 14px 60px}
+h1{font-size:20px;margin:0 0 2px;letter-spacing:.02em}
+.sub{color:var(--muted);font-size:13px;margin-bottom:14px}
+.summary{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:18px;position:sticky;top:0;z-index:2;background:var(--bg);padding:8px 0}
+.stat{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:10px 12px}
+.stat .lbl{font-size:12px;color:var(--muted)}
+.stat .num{font-size:22px;font-weight:700;font-variant-numeric:tabular-nums}
+.stat .num small{font-size:14px;color:var(--muted);font-weight:500}
+.bar{height:5px;background:var(--line);border-radius:3px;margin-top:6px;overflow:hidden}
+.bar i{display:block;height:100%;background:var(--gold);transition:width .2s}
+h2{font-size:14px;margin:20px 0 8px;color:var(--gold);letter-spacing:.08em;display:flex;justify-content:space-between}
+h2 span{color:var(--muted);font-weight:500;letter-spacing:0}
+.list{background:var(--card);border:1px solid var(--line);border-radius:12px;overflow:hidden}
+.row{display:grid;grid-template-columns:1fr auto auto;gap:10px;align-items:center;padding:10px 12px;border-top:1px solid var(--line)}
+.row:first-child{border-top:none}
+.row.present{background:#fbfaf5}
+.who .chara{font-size:12px;color:var(--gold);font-weight:600}
+.who .name{font-weight:600}
+.who .id{font-size:12px;color:var(--muted);text-decoration:none}
+.who .id:hover{text-decoration:underline}
+.note{display:inline-block;margin-top:3px;font-size:12px;background:var(--gold-soft);color:#6d5416;border-radius:6px;padding:1px 7px}
+.chk{display:flex;flex-direction:column;align-items:center;gap:2px;min-width:54px;cursor:pointer;user-select:none;-webkit-tap-highlight-color:transparent}
+.chk .t{font-size:10px;color:var(--muted)}
+.box{width:34px;height:34px;border-radius:9px;border:2px solid #cfc6b3;display:grid;place-items:center;background:#fff;transition:.12s}
+.box svg{width:20px;height:20px;opacity:0}
+.chk.on .box{background:var(--ok);border-color:var(--ok)}
+.chk.on .box svg{opacity:1}
+.chk.money.on .box{background:var(--gold);border-color:var(--gold)}
+.chk.na .box{background:#ececec;border-color:#e0e0e0;opacity:.55}
+.chk.na.on .box{background:var(--gold);border-color:var(--gold);opacity:.45}
+.chk.na .t{opacity:.6}
+.foot{margin-top:24px;display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;font-size:12px;color:var(--muted)}
+button.reset{font:inherit;font-size:12px;border:1px solid var(--line);background:#fff;border-radius:8px;padding:6px 12px;color:var(--ng);cursor:pointer}
+.dlg{position:fixed;inset:0;background:rgba(0,0,0,.35);display:none;place-items:center;z-index:9}
+.dlg.show{display:grid}
+.dlg .in{background:#fff;border-radius:14px;padding:18px;max-width:300px;width:90%;text-align:center}
+.dlg .btns{display:flex;gap:8px;margin-top:14px}
+.dlg button{flex:1;font:inherit;padding:9px;border-radius:9px;border:1px solid var(--line);background:#fff;cursor:pointer}
+.dlg button.danger{background:var(--ng);color:#fff;border-color:var(--ng)}
+.eta{display:inline-flex;align-items:center;gap:4px;margin-top:5px;font:inherit;font-size:13px;font-weight:700;border-radius:999px;padding:3px 10px 3px 8px;border:1.5px solid #3b6fb6;color:#2b5a9c;background:#e8f0fb;cursor:pointer}
+.eta svg{width:14px;height:14px}
+.eta.empty{font-weight:500;border:1.5px dashed #cfc6b3;color:var(--muted);background:transparent}
+.eta.done{border-color:#cfc6b3;color:var(--muted);background:#f1eee6;text-decoration:line-through}
+.wait{background:#eef4fc;border:1px solid #c9daf1;border-radius:12px;padding:10px 12px;margin-bottom:6px}
+.wait .ttl{font-size:12px;color:#2b5a9c;font-weight:700;margin-bottom:6px}
+.wait .it{display:flex;align-items:baseline;gap:10px;padding:3px 0;font-size:14px}
+.wait .tm{font-weight:700;color:#2b5a9c;font-variant-numeric:tabular-nums;min-width:44px}
+.wait .tm.late{color:var(--ng)}
+.wait .ch{font-size:12px;color:var(--muted)}
+.dlg input[type=time]{font:inherit;font-size:22px;padding:8px 10px;border:1px solid var(--line);border-radius:10px;width:100%;margin-top:12px;text-align:center}
+.dlg .who2{font-weight:700;margin-top:2px}
+@media print{
+  .summary{position:static}
+  .foot button,.dlg{display:none}
+  body{background:#fff}
+}
+
+.sync{position:fixed;left:0;right:0;bottom:0;z-index:5;display:flex;align-items:center;justify-content:space-between;gap:8px;padding:8px 14px calc(8px + env(safe-area-inset-bottom));background:rgba(42,38,32,.92);color:#fff;font-size:12px}
+.sync button{font:inherit;font-size:12px;border:1px solid rgba(255,255,255,.4);background:transparent;color:#fff;border-radius:7px;padding:4px 10px;cursor:pointer}
+.sync .dot{display:inline-block;width:8px;height:8px;border-radius:50%;background:#9a9a9a;margin-right:6px;vertical-align:1px}
+.sync.ok .dot{background:#5fd08a}.sync.busy .dot{background:#f0c24a}.sync.err .dot{background:#ff6b5b}
+body.ro .chk[data-k],body.ro .eta{opacity:.75}
+.wrap{padding-bottom:80px}
+.toplink{font-size:12px;color:var(--muted)}
+</style>
+</head>
+<body class="ro">
+<div id="root"><div class="wrap">読み込み中…</div></div>
+<div class="sync" id="sync"><span id="smsg"><span class="dot"></span>読み込み中</span><span><button id="reload">更新</button> <button id="tok">トークン</button></span></div>
+<script>
+(function(){
+var REPO="misumi039/20261115.hsr", PATH="attendance.json";
+var API="https://api.github.com/repos/"+REPO+"/contents/"+PATH;
+var TOK=""; try{ TOK=localStorage.getItem("gh_tok")||""; }catch(e){}
+var SHA=null, PEOPLE=[], state={people:[],att:{},paid:{},eta:{},updated:""};
+var queue=[], timer=null, busy=false;
+
+function esc(s){return String(s).replace(/[&<>"]/g,function(c){return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c];});}
+var CHECK = '<svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>';
+var u8=function(s){return btoa(unescape(encodeURIComponent(s)));}, d8=function(b){return decodeURIComponent(escape(atob(b.replace(/\s/g,""))));};
+
+function status(cls,msg){ var s=document.getElementById("sync"); s.className="sync "+(cls||""); document.getElementById("smsg").innerHTML='<span class="dot"></span>'+esc(msg); }
+function canEdit(){ if(TOK) return true; status("err","閲覧のみ：編集するには「トークン」を設定してください"); return false; }
+function norm(D){ D.att=D.att||{}; D.paid=D.paid||{}; D.eta=D.eta||{}; D.people=D.people||[]; return D; }
+
+function ghGet(){
+  var h={Accept:"application/vnd.github+json"}; if(TOK) h.Authorization="Bearer "+TOK;
+  return fetch(API+"?ref=main&t="+Date.now(),{headers:h,cache:"no-store"}).then(function(r){
+    if(!r.ok) throw new Error("get "+r.status);
+    return r.json();
+  }).then(function(j){ SHA=j.sha; return norm(JSON.parse(d8(j.content))); });
+}
+function load(){
+  if(busy || queue.length) return Promise.resolve();
+  return ghGet().catch(function(){
+    return fetch(PATH+"?t="+Date.now(),{cache:"no-store"}).then(function(r){return r.json();}).then(norm);
+  }).then(function(D){
+    if(busy || queue.length) return;
+    state=D; PEOPLE=D.people; render();
+    status(TOK?"ok":"", TOK?"最新の状態です（GitHubに保存）":"閲覧のみ（編集はトークン設定が必要）");
+  }).catch(function(){ status("err","読み込みに失敗しました"); });
+}
+function apply(D,o){
+  if(o.reset){ D.att={}; D.paid={}; return; }
+  if(o.v===undefined) delete D[o.f][o.k]; else D[o.f][o.k]=o.v;
+}
+function op(f,k,v){ var o={f:f,k:k,v:v}; apply(state,o); queue.push(o); render(); schedule(); }
+function opReset(){ var o={reset:true}; apply(state,o); queue.push(o); render(); schedule(); }
+function schedule(){ status("busy","保存待ち…"); clearTimeout(timer); timer=setTimeout(flush,1200); }
+function now(){var d=new Date();function z(n){return (n<10?"0":"")+n;}return (d.getMonth()+1)+"/"+d.getDate()+" "+z(d.getHours())+":"+z(d.getMinutes());}
+
+function flush(){
+  if(busy || !queue.length) return;
+  busy=true; var ops=queue.slice(); status("busy","GitHubに保存中…");
+  var tries=0;
+  (function attempt(){
+    tries++;
+    ghGet().then(function(D){
+      ops.forEach(function(o){ apply(D,o); });
+      D.updated=now();
+      return fetch(API,{method:"PUT",headers:{Accept:"application/vnd.github+json",Authorization:"Bearer "+TOK,"Content-Type":"application/json"},
+        body:JSON.stringify({message:"update attendance",content:u8(JSON.stringify(D,null,1)+"\n"),sha:SHA,branch:"main"})})
+      .then(function(r){
+        if(r.ok) return r.json().then(function(j){
+          SHA=j.content.sha; queue=queue.slice(ops.length);
+          var mine=norm(JSON.parse(JSON.stringify(D))); queue.forEach(function(o){ apply(mine,o); });
+          state=mine; PEOPLE=state.people; busy=false; render();
+          status("ok","保存しました（"+state.updated+"）");
+          if(queue.length) schedule();
+        });
+        if((r.status===409||r.status===422) && tries<4) return attempt();
+        throw new Error("put "+r.status);
+      });
+    }).catch(function(err){
+      busy=false;
+      var m=String(err&&err.message||"");
+      status("err", /401|403|404/.test(m) ? "保存できません：トークンを確認してください" : "保存に失敗しました。「更新」で再読み込みしてください");
+    });
+  })();
+}
+
+var CLOCK='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>';
+function fmt(t){ if(!t) return ""; var a=t.split(":"); return parseInt(a[0],10)+":"+a[1]; }
+function nowHM(){ var d=new Date(); return (d.getHours()<10?"0":"")+d.getHours()+":"+(d.getMinutes()<10?"0":"")+d.getMinutes(); }
+function findP(k){ var r=null; PEOPLE.forEach(function(g){g.list.forEach(function(p){ if(p.k===k) r=p; });}); return r; }
+var editing=null;
+function render(){
+  var all=[], payable=[];
+  PEOPLE.forEach(function(g){g.list.forEach(function(p){all.push(p); if(!p.free) payable.push(p);});});
+  var nA = all.filter(function(p){return state.att[p.k];}).length;
+  var nP = all.filter(function(p){return state.paid[p.k];}).length;
+  all.forEach(function(p){ if(p.free && state.paid[p.k]) payable.push(p); });
+  var h = '<div class="wrap"><h1>1115 黄金裔併せ 出席表</h1><div class="sub">出席・スタジオ代徴収チェック ・ <a class="toplink" href="./">タイムテーブルへ</a></div>';
+  h += '<div class="summary">'
+     + stat("出席", nA, all.length)
+     + stat("スタジオ代 徴収済", nP, payable.length)
+     + '</div>';
+  var waits = all.filter(function(p){ return state.eta[p.k] && !state.att[p.k]; })
+                 .sort(function(a,b){ return state.eta[a.k] < state.eta[b.k] ? -1 : 1; });
+  if(waits.length){
+    var nw = nowHM();
+    h += '<div class="wait"><div class="ttl">到着待ち（到着目安順）</div>';
+    waits.forEach(function(p){
+      h += '<div class="it"><span class="tm'+(state.eta[p.k] < nw ? ' late' : '')+'">'+fmt(state.eta[p.k])+'</span><span>'+esc(p.name)+'</span>'+(p.chara?'<span class="ch">'+esc(p.chara)+'</span>':'')+'</div>';
+    });
+    h += '</div>';
+  }
+  PEOPLE.forEach(function(g){
+    var ga = g.list.filter(function(p){return state.att[p.k];}).length;
+    h += '<h2>'+g.g+'<span>出席 '+ga+' / '+g.list.length+'</span></h2><div class="list">';
+    g.list.forEach(function(p){
+      var on = !!state.att[p.k], paid = !!state.paid[p.k];
+      h += '<div class="row'+(on?' present':'')+'"><div class="who">'
+        + (p.chara?'<div class="chara">'+esc(p.chara)+'</div>':'')
+        + '<div class="name">'+esc(p.name)+'</div>'
+        + (p.x?'<a class="id" href="https://x.com/'+esc(p.x)+'" target="_blank" rel="noopener">@'+esc(p.x)+'</a>':'')
+        + '<div><button class="eta'+(state.eta[p.k]?(on?' done':''):' empty')+'" data-eta="'+p.k+'">'+CLOCK+(state.eta[p.k]?'到着目安 '+fmt(state.eta[p.k]):'到着目安')+'</button></div>'
+        + (p.note?'<div><span class="note">'+esc(p.note)+'</span></div>':'')
+        + '</div>'
+        + '<div class="chk'+(on?' on':'')+'" data-k="'+p.k+'" data-f="att"><div class="box">'+CHECK+'</div><div class="t">出席</div></div>'
+        + (p.free
+            ? '<div class="chk money na'+(paid?' on':'')+'" data-k="'+p.k+'" data-f="paid" title="スタジオ代不問"><div class="box">'+CHECK+'</div><div class="t">徴収(不問)</div></div>'
+            : '<div class="chk money'+(paid?' on':'')+'" data-k="'+p.k+'" data-f="paid"><div class="box">'+CHECK+'</div><div class="t">徴収</div></div>')
+        + '</div>';
+    });
+    h += '</div>';
+  });
+  h += '<div class="foot"><span>'+(state.updated?'最終更新 '+esc(state.updated):'')+'</span><button class="reset" id="reset">チェックを全てリセット</button></div></div>';
+  h += '<div class="dlg" id="dlg"><div class="in">出席・徴収のチェックを全て外しますか？<div class="btns"><button id="no">やめる</button><button class="danger" id="yes">リセット</button></div></div></div>';
+  h += '<div class="dlg" id="edlg"><div class="in"><div style="font-size:12px;color:var(--muted)">到着目安</div><div class="who2" id="ename"></div><input type="time" id="etime" step="300"><div class="btns"><button id="eclear">消す</button><button id="ecancel">やめる</button><button class="danger" id="esave" style="background:#2b5a9c;border-color:#2b5a9c">保存</button></div></div></div>';
+  document.getElementById("root").innerHTML = h;
+}
+function stat(l,n,t){
+  return '<div class="stat"><div class="lbl">'+l+'</div><div class="num">'+n+' <small>/ '+t+'</small></div><div class="bar"><i style="width:'+(t?n/t*100:0)+'%"></i></div></div>';
+}
+
+
+document.addEventListener("click", function(e){
+  var c = e.target.closest(".chk[data-k]");
+  if(c){ var f=c.getAttribute("data-f"), k=c.getAttribute("data-k"); if(!canEdit()) return; op(f,k,!state[f][k]?true:undefined); return; }
+  var eb = e.target.closest("[data-eta]");
+  if(eb){ if(!canEdit()) return; editing = eb.getAttribute("data-eta"); var p=findP(editing);
+    document.getElementById("ename").textContent = p.name + (p.chara ? "（"+p.chara+"）" : "");
+    document.getElementById("etime").value = state.eta[editing] || "";
+    document.getElementById("edlg").classList.add("show");
+    setTimeout(function(){ try{document.getElementById("etime").focus();}catch(_){} }, 50);
+    return; }
+  if(e.target.id==="esave"){ var v=document.getElementById("etime").value; op("eta",editing,v||undefined); editing=null; return; }
+  if(e.target.id==="eclear"){ op("eta",editing,undefined); editing=null; return; }
+  if(e.target.id==="ecancel" || e.target.id==="edlg"){ document.getElementById("edlg").classList.remove("show"); editing=null; return; }
+  if(e.target.id==="reset"){ if(!canEdit()) return; document.getElementById("dlg").classList.add("show"); return; }
+  if(e.target.id==="no" || e.target.id==="dlg"){ document.getElementById("dlg").classList.remove("show"); return; }
+  if(e.target.id==="yes"){ opReset(); }
+});
+
+document.getElementById("reload").onclick=function(){ queue=[]; busy=false; status("busy","読み込み中…"); load(); };
+document.getElementById("tok").onclick=function(){
+  var t=prompt("GitHubのトークンを入力してください（空にして決定すると削除します）",TOK); if(t===null) return;
+  TOK=t.trim(); try{ TOK?localStorage.setItem("gh_tok",TOK):localStorage.removeItem("gh_tok"); }catch(e){}
+  document.body.classList.toggle("ro",!TOK); load();
+};
+document.body.classList.toggle("ro",!TOK);
+load();
+setInterval(function(){ if(!document.querySelector(".dlg.show")) load(); }, TOK?30000:90000);
+})();
+</script>
+</body>
+</html>

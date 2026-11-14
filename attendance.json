@@ -1,0 +1,144 @@
+{
+ "people": [
+  {
+   "g": "コスプレイヤー",
+   "list": [
+    {
+     "k": "c1",
+     "chara": "アグライア",
+     "name": "379(みなぐ)",
+     "x": "ki11nenko"
+    },
+    {
+     "k": "c2",
+     "chara": "トリビー",
+     "name": "ししゃも",
+     "x": "jt_vh1"
+    },
+    {
+     "k": "c3",
+     "chara": "キャストリス",
+     "name": "無力ﾈｷ",
+     "x": "muryoku_1hy"
+    },
+    {
+     "k": "c4",
+     "chara": "アナイクス",
+     "name": "ほうれんそう",
+     "x": "Haruno_nanaW"
+    },
+    {
+     "k": "c5",
+     "chara": "ヒアンシー",
+     "name": "すずは",
+     "x": "00suzuha"
+    },
+    {
+     "k": "c6",
+     "chara": "サフェル",
+     "name": "ぽち",
+     "free": true,
+     "note": "スタジオ代不問"
+    },
+    {
+     "k": "c7",
+     "chara": "ファイノン",
+     "name": "せんと",
+     "x": "sentokundesuga",
+     "free": true,
+     "note": "スタジオ代不問"
+    },
+    {
+     "k": "c8",
+     "chara": "セイレンス",
+     "name": "つゆりちゃん",
+     "x": "motorprotein57"
+    },
+    {
+     "k": "c9",
+     "chara": "ケリュドラ",
+     "name": "てい",
+     "x": "cos_tei"
+    },
+    {
+     "k": "c10",
+     "chara": "長夜月",
+     "name": "すお",
+     "x": "suop_q66"
+    },
+    {
+     "k": "c11",
+     "chara": "キュレネ(モモ)",
+     "name": "こまち",
+     "x": "kmch1_cos"
+    },
+    {
+     "k": "c12",
+     "chara": "キュレネ(デミウルゴス)",
+     "name": "ヒナキ",
+     "x": "hinaki630s"
+    },
+    {
+     "k": "c13",
+     "chara": "開拓者",
+     "name": "しの",
+     "free": true,
+     "note": "スタジオ代不問"
+    }
+   ]
+  },
+  {
+   "g": "カメラマン",
+   "list": [
+    {
+     "k": "p1",
+     "name": "からす",
+     "x": "karasu_kobe"
+    },
+    {
+     "k": "p2",
+     "name": "やー",
+     "x": "yar_cam0920"
+    },
+    {
+     "k": "p3",
+     "name": "ジャイロ",
+     "x": "jojoagogo20204"
+    },
+    {
+     "k": "p4",
+     "name": "鬼あさり",
+     "x": "oniasari01"
+    },
+    {
+     "k": "p5",
+     "name": "Lyn",
+     "x": "lynfi386"
+    }
+   ]
+  },
+  {
+   "g": "アシスタント",
+   "list": [
+    {
+     "k": "a1",
+     "name": "ぽん",
+     "free": true,
+     "note": "スタジオ代不問"
+    },
+    {
+     "k": "a2",
+     "name": "デカオ",
+     "free": true,
+     "note": "スタジオ代不問"
+    }
+   ]
+  }
+ ],
+ "att": {},
+ "paid": {},
+ "eta": {
+  "c4": "09:30"
+ },
+ "updated": ""
+}
