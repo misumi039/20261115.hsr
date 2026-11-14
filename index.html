@@ -18,7 +18,7 @@ details{margin:0 12px 8px;background:var(--card);border-radius:8px;padding:6px 1
 #pn{display:none;margin:0 12px 8px;padding:10px;border:1px solid var(--line);border-radius:8px;gap:8px;flex-wrap:wrap;align-items:center}
 #grid{display:flex;position:relative;overflow-x:auto;padding:0 12px 24px}
 .tc{flex:0 0 44px}.lane{flex:1 0 140px;min-width:140px}
-.hd{height:26px;text-align:center;font-weight:600;border-bottom:1px solid var(--line)}
+.hd{height:26px;text-align:center;font-weight:600;border-bottom:1px solid var(--line)}.lane>.hd{cursor:pointer;text-decoration:underline dotted;text-underline-offset:3px}#mp{position:fixed;inset:0;z-index:99;background:rgba(0,0,0,.82);overflow:auto;padding:12px;-webkit-overflow-scrolling:touch}#mp h3{color:#fff;margin:0 0 8px;font-size:17px}#mp img{display:block;width:100%;max-width:900px;margin:0 auto 12px;border-radius:6px;background:#fff}#mp .x{position:sticky;top:0;float:right;background:#fff;color:#000;border:0;border-radius:18px;padding:6px 14px;font-size:15px}
 .body{position:relative;border-left:1px solid var(--line);background:repeating-linear-gradient(var(--line) 0 1px,transparent 1px calc(var(--H)*6)),repeating-linear-gradient(color-mix(in srgb,var(--line) 45%,transparent) 0 1px,transparent 1px var(--H))}
 .tc .body{border:0}.tc i{position:absolute;right:4px;font-size:11px;color:var(--mut);font-style:normal;transform:translateY(-6px)}
 .b{position:absolute;left:2px;right:2px;overflow:hidden;background:color-mix(in srgb,var(--pc,#e5e5ea) var(--bl),var(--bg));border-left:4px solid color-mix(in srgb,var(--pc,#e5e5ea),#000 40%);border-radius:6px;padding:1px 6px;font-size:13px;line-height:1.3;box-sizing:border-box;box-shadow:0 1px 2px rgba(0,0,0,.12)}
@@ -41,7 +41,7 @@ html{height:100%}body{display:flex;flex-direction:column;height:100vh;height:100
 <div id="sc"><div id="st">読み込み中…</div>
 <details id="dt" hidden><summary id="sm"></summary><div id="ls"></div></details>
 <div id="pn">メイン <span id="pp"></span><select id="ps"></select><select id="pl"></select>担当 <span id="pa"></span><select id="pg"></select><select id="pe"></select><input id="mo" placeholder="メモ" size="28"><label><input type="checkbox" id="tp" style="width:18px;height:18px;vertical-align:-3px"> 仮枠</label><div id="pm"></div><button id="sv" class="on">保存</button><button id="dl">削除</button><button id="cl">閉じる</button></div>
-<div id="info" hidden></div><div id="my" hidden></div><div id="grid"></div></div>
+<div id="mp" hidden></div><div id="info" hidden></div><div id="my" hidden></div><div id="grid"></div></div>
 <script>
 const $=s=>document.querySelector(s),H0=540,H1=1140,ROWS=(H1-H0)/10;
 const esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
@@ -86,7 +86,7 @@ function render(){
  const{E,W,el,wl}=check(),f=$('#ft').value;CK={E,W};const lv=true,keys=M.locs.map(l=>l.n).concat([...slots.values()].some(s=>!s.l&&s.g!=='休憩')?['']:[]);let h='<div class="tc"><div class="hd"></div><div class="body" style="height:calc(var(--H)*'+ROWS+')">';
  for(let m=H0;m<H1;m+=60)h+='<i style="top:calc(var(--H)*'+(m-H0)/10+')">'+fmt(m)+'</i>';
  h+='</div></div>';
- keys.forEach(p=>{h+='<div class="lane"><div class="hd">'+esc(p||'場所なし')+'</div><div class="body" data-p="'+esc(p)+'" style="height:calc(var(--H)*'+ROWS+')">';
+ keys.forEach(p=>{h+='<div class="lane"><div class="hd" data-m="'+esc(p)+'">'+esc(p||'場所なし')+'</div><div class="body" data-p="'+esc(p)+'" style="height:calc(var(--H)*'+ROWS+')">';
   lst(p,lv).forEach(s=>{const e=E[s.id],w=W[s.id],mm=sm(s),d=0;
    h+='<div class="b '+(e?'e':w?'w':'')+(d?' d':'')+(s.sub?' sub':'')+(isT(s)?' tent':'')+'" data-id="'+s.id+'" title="'+esc((e||[]).concat(w||[]).concat(s.memo?['メモ: '+s.memo]:[]).join('\n'))+'" style="'+pcs(s)+';top:calc(var(--H)*'+(s.s-H0)/10+');height:calc(var(--H)*'+(s.e-s.s)/10+' - 2px)"><b>'+esc(tn(s))+'</b>'+cn(s)+' '+esc(lv?s.pp.join('・'):s.l||'')+'<br><small>'+(s.sub?'[サブ] ':'')+(s.a?'担当'+esc(s.a)+' ':'')+fmt(s.s)+'-'+fmt(s.e)+(mm.length?' '+mm.length+'人':'')+(e?' エラー:'+esc(e[0]):'')+(s.memo?'<br><span style="font-weight:600">メモ: '+esc(s.memo)+'</span>':'')+'</small></div>'});
   h+='</div></div>'});
@@ -145,6 +145,8 @@ $('#ft').onchange=render;
  g.addEventListener('touchstart',()=>{clearTimeout(t);rs()},{passive:true});
  g.addEventListener('scroll',()=>{if(!lock){const dx=Math.abs(g.scrollLeft-sl),dy=Math.abs(g.scrollTop-st);if(dx+dy<24)return;lock=dx>dy?'x':'y';if(lock==='x')g.style.overflowY='hidden';else g.style.overflowX='hidden'}
   clearTimeout(t);t=setTimeout(rs,250)},{passive:true})})();
+const MP={'ダイニング':[12],'本館1F':[8],'本館2F':[9],'玄関・廊下':[4,5],'チャペル中':[10],'チャペル外・倉庫':[10,11],'庭・木':[6,7]};
+document.addEventListener('click',e=>{const m=$('#mp'),h=e.target.closest&&e.target.closest('.lane>.hd[data-m]');if(e.target.closest&&e.target.closest('#mp')){if(e.target.tagName!=='IMG'){m.hidden=true;m.innerHTML=''}return}if(!h)return;const n=h.dataset.m,l=MP[n];if(!l)return;const u=i=>'img/t-'+String(i).padStart(2,'0')+'.jpg';m.innerHTML='<button class="x">閉じる</button><h3>'+esc(n)+'</h3>'+l.map(i=>'<img loading="lazy" src="'+u(i)+'">').join('')+'<h3>全体マップ</h3><img loading="lazy" src="'+u(3)+'">';m.hidden=false;m.scrollTop=0});
 const REPO='misumi039/20261115.hsr',API='https://api.github.com/repos/'+REPO+'/contents/data.json';
 let TOK='',SHA=null;try{TOK=localStorage.getItem('gh_tok')||''}catch(e){}
 const setTok=()=>{const t=prompt('GitHubのトークンを入力してください(空にして決定すると削除します)',TOK);if(t===null)return;TOK=t.trim();try{TOK?localStorage.setItem('gh_tok',TOK):localStorage.removeItem('gh_tok')}catch(e){}say(TOK?'トークンを保存しました。':'トークンを削除しました。')};
