@@ -40,7 +40,7 @@ html{height:100%}body{display:flex;flex-direction:column;height:100vh;height:100
 <select id="wx"><option value="rain">雨版</option><option value="sun">晴れ版</option></select><select id="ft"></select><button id="md">編集モード: オフ</button><button id="tk" onclick="setTok()">トークン設定</button><button onclick="print()">印刷</button></header>
 <div id="sc"><div id="st">読み込み中…</div>
 <details id="dt" hidden><summary id="sm"></summary><div id="ls"></div></details>
-<div id="pn">メイン <span id="pp"></span><select id="ps"></select><select id="pl"></select>担当 <span id="pa"></span><select id="pg"></select><select id="pe"></select><input id="mo" placeholder="メモ" size="28"><div id="pm"></div><button id="sv" class="on">保存</button><button id="dl">削除</button><button id="cl">閉じる</button></div>
+<div id="pn">メイン <span id="pp"></span><select id="ps"></select><select id="pl"></select>担当 <span id="pa"></span><select id="pg"></select><select id="pe"></select><input id="mo" placeholder="メモ" size="28"><label><input type="checkbox" id="tp" style="width:18px;height:18px;vertical-align:-3px"> 仮枠</label><div id="pm"></div><button id="sv" class="on">保存</button><button id="dl">削除</button><button id="cl">閉じる</button></div>
 <div id="info" hidden></div><div id="my" hidden></div><div id="grid"></div></div>
 <script>
 const $=s=>document.querySelector(s),H0=540,H1=1140,ROWS=(H1-H0)/10;
@@ -48,7 +48,7 @@ const esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;',
 const fmt=m=>Math.floor(m/60)+':'+String(m%60).padStart(2,'0');
 let db=null,M=null,slots=new Map(),edit=false,cur=null,CK={E:{},W:{}};
 const grp=n=>M.groups.find(g=>g.n===n)||{n,m:[],p:''};
-const tt=s=>{if(s.g==='休憩')return s.t||s.g;let m=[];try{m=sm(s).filter(x=>!(M.absent||[]).includes(x))}catch(e){}if(m.length<3)return m.length?m.join('・'):s.g;return s.g};const isT=s=>s.g==='個撮'&&![...slots.values()].some(o=>o!==s&&o.g==='個撮'&&sm(o)[0]===sm(s)[0]&&o.s>s.s);const tn=s=>tt(s)+(isT(s)?'（仮）':'');const setA=v=>document.querySelectorAll('#pa input').forEach(o=>o.checked=o.value===v);const getA=()=>(document.querySelector('#pa input:checked')||{}).value||'';const setP=v=>document.querySelectorAll('#pp input').forEach(o=>o.checked=o.value===v);const getP=()=>(document.querySelector('#pp input:checked')||{}).value||'';const sm=s=>Array.isArray(s.ms)?s.ms:grp(s.g).m;const setMem=a=>document.querySelectorAll('#pm input').forEach(o=>o.checked=a.includes(o.value));
+const tt=s=>{if(s.g==='休憩')return s.t||s.g;let m=[];try{m=sm(s).filter(x=>!(M.absent||[]).includes(x))}catch(e){}if(m.length<3)return m.length?m.join('・'):s.g;return s.g};const isT=s=>!!s.tent||s.g==='個撮'&&![...slots.values()].some(o=>o!==s&&o.g==='個撮'&&sm(o)[0]===sm(s)[0]&&o.s>s.s);const tn=s=>tt(s)+(isT(s)?'（仮）':'');const setA=v=>document.querySelectorAll('#pa input').forEach(o=>o.checked=o.value===v);const getA=()=>(document.querySelector('#pa input:checked')||{}).value||'';const setP=v=>document.querySelectorAll('#pp input').forEach(o=>o.checked=o.value===v);const getP=()=>(document.querySelector('#pp input:checked')||{}).value||'';const sm=s=>Array.isArray(s.ms)?s.ms:grp(s.g).m;const setMem=a=>document.querySelectorAll('#pm input').forEach(o=>o.checked=a.includes(o.value));
 const isOut=n=>!!(M.locs.find(l=>l.n===n)||{}).o;
 function check(){
  const L=[...slots.values()].sort((a,b)=>a.s-b.s),E={},W={},el=[],wl=[];
@@ -104,7 +104,7 @@ function fill(){if(!M)return;const v=$('#ft').value;
  let t='';for(let m=H0;m<H1;m+=10)t+='<option value="'+m+'">'+fmt(m)+'</option>';$('#ps').innerHTML=t;
  let l='';for(let k=1;k<=12;k++)l+='<option value="'+k*10+'">'+k*10+'分</option>';$('#pe').innerHTML=l;}
 function open_(s){cur=s;$('#pn').style.display='flex';setP(s.p);$('#ps').value=s.s;$('#pe').value=s.e-s.s;
- $('#pl').value=s.l||'';setA(s.a||'');$('#mo').value=s.memo||'';if(s.g)$('#pg').value=s.g;setMem(s.g?sm(s):grp($('#pg').value).m);$('#dl').style.display=s.id?'':'none';$('#dl').textContent='削除';delete $('#dl').dataset.ok}
+ $('#pl').value=s.l||'';setA(s.a||'');$('#mo').value=s.memo||'';$('#tp').checked=!!s.tent;if(s.g)$('#pg').value=s.g;setMem(s.g?sm(s):grp($('#pg').value).m);$('#dl').style.display=s.id?'':'none';$('#dl').textContent='削除';delete $('#dl').dataset.ok}
 $('#pg').onchange=()=>{const g=grp($('#pg').value);if(g.p)setP(g.p);setMem(g.m)};
 $('#grid').onclick=e=>{const b=e.target.closest('.b');
  if(b){const s=slots.get(b.dataset.id);showInfo(s);return edit?open_(s):0}
@@ -115,7 +115,7 @@ $('#grid').onclick=e=>{const b=e.target.closest('.b');
 function ask2(){const b=$('#dl');if(b.dataset.ok){delete b.dataset.ok;b.textContent='削除';return true}b.dataset.ok=1;b.textContent='本当に削除';setTimeout(()=>{delete b.dataset.ok;b.textContent='削除'},4000);return false}
 const say=t=>{$('#st').textContent=t};
 const fail=()=>say('保存できませんでした。トークンが正しいか、このリポジトリへの書き込み権限があるか確認してください。');
-$('#sv').onclick=async()=>{const s=+$('#ps').value,d={s,e:s+ +$('#pe').value,g:$('#pg').value,p:getP(),l:$('#pl').value,a:getA(),ps:[],v:wv()};const mm_=$('#mo').value.trim();if(mm_)d.memo=mm_;const mc=[...$('#pm').querySelectorAll('input:checked')].map(o=>o.value),gm=grp(d.g).m;if(!(mc.length===gm.length&&mc.every(x=>gm.includes(x))))d.ms=mc;
+$('#sv').onclick=async()=>{const s=+$('#ps').value,d={s,e:s+ +$('#pe').value,g:$('#pg').value,p:getP(),l:$('#pl').value,a:getA(),ps:[],v:wv()};const mm_=$('#mo').value.trim();if(mm_)d.memo=mm_;if($('#tp').checked)d.tent=true;const mc=[...$('#pm').querySelectorAll('input:checked')].map(o=>o.value),gm=grp(d.g).m;if(!(mc.length===gm.length&&mc.every(x=>gm.includes(x))))d.ms=mc;
  try{await db.collection('slots').doc(cur.id||'s'+Date.now().toString(36)).set(d);$('#pn').style.display='none'}catch(x){fail()}};
 $('#dl').onclick=async()=>{if(!ask2('この枠を削除しますか?'))return;try{await db.collection('slots').doc(cur.id).delete();$('#pn').style.display='none'}catch(x){fail()}};
 $('#cl').onclick=()=>$('#pn').style.display='none';
